@@ -43,8 +43,7 @@
                 <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2"
-                    android:rowCount="4">
+                    android:columnCount="2">
 
                     <!-- Column 1 (Left within Settings) -->
                     <LinearLayout
@@ -102,7 +101,10 @@
                             android:layout_height="wrap_content"
                             android:text="@string/pref_collect_at_bottom"
                             android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:textColor="@color/sakura_text_dark" />
+                            android:textColor="@color/sakura_text_dark"
+                            android:textOn=""
+                            android:textOff=""
+                            app:showText="false" />
                     </LinearLayout>
 
                     <!-- Column 2 (Right within Settings) -->

@@ -10,14 +10,24 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/sakura_green</item>
         <item name="colorOnSecondary">@color/sakura_white</item>
+        <item name="colorSecondaryContainer">@color/sakura_green</item>
+        <item name="colorOnSecondaryContainer">@color/sakura_white</item>
 
         <!-- Background colors -->
         <item name="android:windowBackground">@color/sakura_pink_light</item>
         <item name="colorSurface">@color/sakura_pink_light</item>
         <item name="colorOnSurface">@color/sakura_text_dark</item>
+        <item name="colorSurfaceVariant">@color/sakura_pink_medium</item>
+        <item name="colorOnSurfaceVariant">@color/sakura_text_dark</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/sakura_pink_light</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Fix for Tonal Buttons on some devices -->
+        <item name="colorTertiary">@color/sakura_pink_medium</item>
+        <item name="colorOnTertiary">@color/sakura_text_dark</item>
+        <item name="colorTertiaryContainer">@color/sakura_pink_light</item>
+        <item name="colorOnTertiaryContainer">@color/sakura_text_dark</item>
     </style>
 </resources>
