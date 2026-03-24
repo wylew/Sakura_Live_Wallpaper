@@ -39,7 +39,7 @@ object WallpaperConfig {
 
     // Internal Logic (Not user facing)
     const val SETTLE_PROBABILITY = 0.15f // 50% chance to settle
-    const val MAX_PILE_HEIGHT_PERCENT = 0.99f // 15% of screen height
+    const val MAX_PILE_HEIGHT_PERCENT = 0.10f // 15% of screen height
     const val SHAKE_THRESHOLD = 12.0f // Sensitivity for shake detection
     const val MAX_GROUNDED_PETALS = 1500 // Maximum number of petals that can settle at the bottom
 }

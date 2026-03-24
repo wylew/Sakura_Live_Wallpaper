@@ -42,7 +42,6 @@ class SakuraWallpaperService : WallpaperService() {
         private var accelerometer: Sensor? = null
         
         private var spawnAccumulator = 0f
-        private val SPAWN_RATE_LIMIT = 5f 
 
         private val drawRunner = object : Runnable {
             override fun run() {
@@ -99,7 +98,6 @@ class SakuraWallpaperService : WallpaperService() {
             val height = surfaceHolder.surfaceFrame.height()
             
             if (width > 0 && height > 0) {
-                val count = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
                 val wind = prefs.getFloat("wind_strength", 0.5f)
                 val size = prefs.getFloat("petal_size", 20f)
                 val speed = prefs.getFloat("fall_speed", 0.5f)
@@ -109,15 +107,6 @@ class SakuraWallpaperService : WallpaperService() {
                 val collect = prefs.getBoolean("collect_at_bottom", false)
 
                 allPetals.forEach { it.updateSettings(size, wind, speed, color, alpha, collect, rotSpeed) }
-
-                val currentActive = allPetals.count { !it.isGrounded }
-                if (currentActive < count) {
-                    repeat(count - currentActive) {
-                        val p = Petal(width, height, count, wind, size, speed, color, alpha, collect, rotSpeed)
-                        p.y = Random.nextFloat() * height
-                        allPetals.add(p)
-                    }
-                }
             }
         }
 
@@ -128,7 +117,8 @@ class SakuraWallpaperService : WallpaperService() {
                 canvas = holder.lockCanvas()
                 if (canvas != null) {
                     val currentTime = System.currentTimeMillis()
-                    val deltaTime = (currentTime - lastTime) / 1000f
+                    // Cap deltaTime to avoid huge jumps on wake/lag
+                    val deltaTime = ((currentTime - lastTime) / 1000f).coerceAtMost(0.05f)
                     lastTime = currentTime
 
                     drawBackground(canvas)
@@ -139,55 +129,54 @@ class SakuraWallpaperService : WallpaperService() {
                     val currentFallingCount = allPetals.count { !it.isGrounded && !it.isBlowingAway }
                     val groundedCount = allPetals.count { it.isGrounded }
                     
-                    Log.d(TAG, "Stats: Falling=$currentFallingCount, Grounded=$groundedCount, Total=${allPetals.size}")
-
+                    // Dynamic spawn rate: faster if we are empty, but always capped
+                    val baseSpawnRate = (targetCount / 10f).coerceIn(2f, 15f) 
+                    
                     if (currentFallingCount < targetCount) {
-                        spawnAccumulator += deltaTime * SPAWN_RATE_LIMIT
+                        spawnAccumulator += deltaTime * baseSpawnRate
                         while (spawnAccumulator >= 1f && allPetals.count { !it.isGrounded && !it.isBlowingAway } < targetCount) {
                             val p = createNewPetal(canvas.width, canvas.height, targetCount, collect)
-                            p.y = -p.size * 4
+                            p.y = -p.size * 5 // Spawn well above screen
                             allPetals.add(p)
                             spawnAccumulator -= 1f
                         }
                     }
-                    if (spawnAccumulator > 2f) spawnAccumulator = 2f
+                    if (spawnAccumulator > 1f) spawnAccumulator = 1f
 
                     val iterator = allPetals.iterator()
-                    var processedFalling = 0
+                    var fallingTracker = currentFallingCount
+                    
                     while (iterator.hasNext()) {
                         val p = iterator.next()
                         
                         if (!p.isGrounded) {
                             p.update(deltaTime)
                             
-                            if (p.y > canvas.height + p.size * 4) {
-                                if (!p.isBlowingAway) {
-                                    processedFalling++
-                                    if (processedFalling > targetCount) {
-                                        iterator.remove()
-                                        continue
-                                    }
+                            val isOffBottom = p.y > canvas.height + p.size * 4
+                            val isBlowingOffScreen = p.isBlowingAway && (p.y < -p.size * 10 || p.x < -p.size * 10 || p.x > canvas.width + p.size * 10)
 
-                                    // Check GROUNDED LIMIT before settling
-                                    if (collect && groundedCount < WallpaperConfig.MAX_GROUNDED_PETALS) {
-                                        if (Random.nextFloat() < WallpaperConfig.SETTLE_PROBABILITY) {
-                                            val maxPileY = canvas.height * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
-                                            p.y = canvas.height - (Random.nextFloat() * (canvas.height - maxPileY))
-                                            p.isGrounded = true
-                                        } else {
-                                            p.reset()
-                                        }
+                            if (isOffBottom || isBlowingOffScreen) {
+                                // If we have too many petals already, remove this one to prevent "waves"
+                                if (fallingTracker > targetCount) {
+                                    iterator.remove()
+                                    fallingTracker--
+                                    continue
+                                }
+
+                                if (isOffBottom && !p.isBlowingAway && collect && groundedCount < WallpaperConfig.MAX_GROUNDED_PETALS) {
+                                    if (Random.nextFloat() < WallpaperConfig.SETTLE_PROBABILITY) {
+                                        val maxPileY = canvas.height * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
+                                        p.y = canvas.height - (Random.nextFloat() * (canvas.height - maxPileY))
+                                        p.isGrounded = true
+                                        fallingTracker--
                                     } else {
                                         p.reset()
                                     }
                                 } else {
                                     p.reset()
                                 }
-                            } else if (p.isBlowingAway && (p.y < -p.size * 10 || p.x < -p.size * 10 || p.x > canvas.width + p.size * 10)) {
-                                p.reset()
                             }
                         }
-                        
                         p.draw(canvas)
                     }
                 }
