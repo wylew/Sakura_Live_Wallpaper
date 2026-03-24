@@ -9,7 +9,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.slider.Slider
 
 class SettingsActivity : AppCompatActivity() {
@@ -32,7 +32,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setupSliders()
         setupButtons()
-        setupSwitch()
+        setupCheckbox()
     }
 
     private fun setupSliders() {
@@ -113,8 +113,8 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSwitch() {
-        findViewById<MaterialSwitch>(R.id.switch_collect_at_bottom).apply {
+    private fun setupCheckbox() {
+        findViewById<MaterialCheckBox>(R.id.check_collect_at_bottom).apply {
             isChecked = prefs.getBoolean("collect_at_bottom", false)
             setOnCheckedChangeListener { _, isChecked ->
                 prefs.edit().putBoolean("collect_at_bottom", isChecked).apply()
