@@ -30,183 +30,191 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
+            <!-- Preview Card with Overlay Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginBottom="24dp"
+                android:layout_height="240dp"
+                android:layout_marginBottom="20dp"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
-                <com.wylew.sakuralivewallpaper.WallpaperPreviewView
-                    android:id="@+id/wallpaper_preview"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#222" />
+                    android:layout_height="match_parent">
 
+                    <com.wylew.sakuralivewallpaper.WallpaperPreviewView
+                        android:id="@+id/wallpaper_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#222" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_select_background"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="12dp"
+                        android:text="@string/pref_background_image"
+                        android:textColor="@color/sakura_text_dark"
+                        app:backgroundTint="#CCFFB6C1"
+                        app:cornerRadius="16dp"
+                        app:icon="@android:drawable/ic_menu_gallery"
+                        app:iconPadding="4dp"
+                        app:iconSize="18dp" />
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Petal Count -->
-            <TextView
+            <!-- Two Column Settings Grid -->
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pref_petal_count"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
+                android:columnCount="2"
+                android:rowCount="4">
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_petal_count"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
+                <!-- Column 1 (Left) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
 
-            <!-- Wind Strength -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_wind_strength"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_petal_count"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_petal_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_wind_strength"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_petal_size"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_petal_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <!-- Petal Size -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_petal_size"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_petal_color"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_petal_color"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_petal_size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_collect_at_bottom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_collect_at_bottom"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                </LinearLayout>
 
-            <!-- Fall Speed -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_fall_speed"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
+                <!-- Column 2 (Right) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_fall_speed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_wind_strength"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_wind_strength"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <!-- Rotation Speed -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_rotation_speed"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_fall_speed"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_fall_speed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_rotation_speed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_rotation_speed"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_rotation_speed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
 
-            <!-- Petal Color -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_petal_color"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_petal_color"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
-
-            <!-- Transparency -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pref_transparency"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="@color/sakura_text_dark"
-                android:layout_marginStart="4dp" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_transparency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:thumbColor="@color/sakura_pink_dark"
-                app:trackColorActive="@color/sakura_pink_dark"
-                app:trackColorInactive="@color/sakura_pink_medium" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_select_background"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="@string/pref_background_image"
-                app:backgroundTint="@color/sakura_pink_medium"
-                app:cornerRadius="28dp"
-                android:textColor="@color/sakura_text_dark" />
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/switch_collect_at_bottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="@string/pref_collect_at_bottom"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/sakura_text_dark" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_transparency"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="@color/sakura_text_dark" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_transparency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:thumbColor="@color/sakura_pink_dark"
+                        app:trackColorActive="@color/sakura_pink_dark" />
+                </LinearLayout>
+            </GridLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_set_wallpaper"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginBottom="40dp"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
                 android:text="Set Wallpaper"
+                android:textColor="@color/sakura_text_dark"
                 app:backgroundTint="@color/sakura_green"
-                app:cornerRadius="32dp"
-                android:textSize="18sp"
-                android:textColor="@color/sakura_white" />
+                app:cornerRadius="16dp"
+                app:icon="@android:drawable/ic_menu_set_as"
+                app:iconPadding="4dp"
+                app:iconSize="18dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
