@@ -19,27 +19,28 @@ class Petal(
     var collectAtBottom: Boolean,
     var rotationSpeed: Float
 ) {
-    private var x = Random.nextFloat() * screenWidth
-    private var y = Random.nextFloat() * screenHeight
+    var x = Random.nextFloat() * screenWidth
+    var y = Random.nextFloat() * screenHeight
     
-    // Independent rotation states
     private var rotationX = Random.nextFloat() * 360f
     private var rotationY = Random.nextFloat() * 360f
     private var rotationZ = Random.nextFloat() * 360f
     
-    // Randomized baseline rotation speeds
     private var baseRotSpeedX = (Random.nextFloat() - 0.5f) * 0.04f
     private var baseRotSpeedY = (Random.nextFloat() - 0.5f) * 0.1f
     private var baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
 
-    // Randomized movement parameters
     private var swayOffset = Random.nextFloat() * Math.PI.toFloat() * 2
     private var swaySpeed = 0.5f + Random.nextFloat() * 1.5f
     private var horizontalDrift = (Random.nextFloat() - 0.5f) * 30f
     private var verticalOscillationOffset = Random.nextFloat() * Math.PI.toFloat() * 2
     private var verticalOscillationSpeed = 0.5f + Random.nextFloat() * 1f
     
-    private var isGrounded = false
+    var isGrounded = false
+    var isBlowingAway = false
+    private var blowAwaySpeedX = 0f
+    private var blowAwaySpeedY = 0f
+
     private val path = Path()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
@@ -61,55 +62,55 @@ class Petal(
     fun update(deltaTime: Float) {
         if (isGrounded) return
 
-        // Base vertical movement with slight individual oscillation (air resistance simulation)
+        if (isBlowingAway) {
+            x += blowAwaySpeedX * deltaTime
+            y += blowAwaySpeedY * deltaTime
+            blowAwaySpeedY += 500f * deltaTime // Gravity
+            rotationZ += 10f
+            
+            // Boundary check for blowing away handled by service or here
+            return
+        }
+
         verticalOscillationOffset += deltaTime * verticalOscillationSpeed
         val vOsc = sin(verticalOscillationOffset.toDouble()).toFloat() * 15f
         val baseSpeed = (40f + speed * 160f) + vOsc
         y += baseSpeed * deltaTime
         
-        // Horizontal movement: Wind + Periodic Sway + Individual Drift
         swayOffset += deltaTime * swaySpeed
-        val swayAmplitude = 15f + windStrength * 120f
-        val breeze = sin(swayOffset.toDouble()).toFloat() * swayAmplitude
-        
-        // Add a secondary, slower wave for "gust" simulation
-        val gust = sin(swayOffset.toDouble() * 0.3).toFloat() * (windStrength * 40f)
-        
+        val breeze = sin(swayOffset.toDouble()).toFloat() * (15f + windStrength * 120f)
         val windDrift = windStrength * 250f
-        x += (windDrift + breeze + gust + horizontalDrift) * deltaTime
+        x += (windDrift + breeze + horizontalDrift) * deltaTime
         
-        // Update rotations
         rotationX += baseRotSpeedX * rotationSpeed
         rotationY += baseRotSpeedY * rotationSpeed
         rotationZ += baseRotSpeedZ * rotationSpeed
 
-        // Grounding or Reset
-        if (y > screenHeight) {
-            if (collectAtBottom && Random.nextFloat() < 0.15f) {
-                y = screenHeight - (Random.nextFloat() * size * 0.8f)
-                isGrounded = true
-            } else {
-                reset()
-            }
-        }
-        
-        // Wrap horizontally with padding
+        // X-axis wrapping
         if (x > screenWidth + size * 4) x = -size * 2
         if (x < -size * 4) x = screenWidth.toFloat() + size * 2
     }
 
     fun reset() {
         x = Random.nextFloat() * screenWidth
-        y = -size * 4 // Start further above screen
+        y = -size * 4
         isGrounded = false
+        isBlowingAway = false
         swayOffset = Random.nextFloat() * Math.PI.toFloat() * 2
         horizontalDrift = (Random.nextFloat() - 0.5f) * 30f
         verticalOscillationOffset = Random.nextFloat() * Math.PI.toFloat() * 2
         
-        // Re-randomize speeds slightly on reset for variety
         baseRotSpeedX = (Random.nextFloat() - 0.5f) * 0.04f
         baseRotSpeedY = (Random.nextFloat() - 0.5f) * 0.1f
         baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
+    }
+
+    fun blowAway() {
+        if (!isGrounded) return
+        isGrounded = false
+        isBlowingAway = true
+        blowAwaySpeedX = (Random.nextFloat() - 0.2f) * 800f
+        blowAwaySpeedY = -Random.nextFloat() * 600f - 200f
     }
 
     fun draw(canvas: Canvas) {
@@ -138,5 +139,10 @@ class Petal(
         this.alpha = alpha
         this.collectAtBottom = collectAtBottom
         this.rotationSpeed = rotationSpeed
+        
+        if (!collectAtBottom && isGrounded) {
+            isGrounded = false
+            // Will be reset by service on next update if it's below screen
+        }
     }
 }
