@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sakura_pink_light"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/app_name"
+            android:textColor="@color/sakura_text_dark"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <com.wylew.sakuralivewallpaper.WallpaperPreviewView
+        android:id="@+id/wallpaper_preview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#222" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_petal_count"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_petal_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="200" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_wind_strength"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_wind_strength"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_petal_size"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_petal_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_fall_speed"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_fall_speed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_rotation_speed"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_rotation_speed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_petal_color"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_petal_color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="100" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_transparency"
+                android:textColor="@color/sakura_text_dark" />
+            <SeekBar
+                android:id="@+id/sb_transparency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/sakura_pink_dark"
+                android:thumbTint="@color/sakura_pink_dark"
+                android:max="255" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_select_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/sakura_pink_dark"
+                android:text="@string/pref_background_image"
+                android:textColor="@color/sakura_white" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cb_collect_at_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/pref_collect_at_bottom"
+                android:textColor="@color/sakura_text_dark"
+                android:buttonTint="@color/sakura_pink_dark" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_set_wallpaper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/sakura_green"
+                android:text="Set Wallpaper"
+                android:textColor="@color/sakura_white" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

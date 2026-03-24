@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sakura Theme Colors -->
+    <color name="sakura_pink_light">#FFF0F5</color> <!-- Lavender Blush -->
+    <color name="sakura_pink_medium">#FFB6C1</color> <!-- Light Pink -->
+    <color name="sakura_pink_dark">#FF69B4</color> <!-- Hot Pink -->
+    <color name="sakura_green">#8BA36D</color> <!-- Soft Leaf Green -->
+    <color name="sakura_white">#FFFFFF</color>
+    <color name="sakura_text_dark">#4A2C2C</color> <!-- Deep Brownish-Pink for text -->
+
+    <!-- Standard Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

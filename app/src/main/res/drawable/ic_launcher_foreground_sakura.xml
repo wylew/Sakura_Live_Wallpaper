@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background Leaves -->
+    <path
+        android:fillColor="#8BA36D"
+        android:pathData="M72,32c4,-6 14,-8 20,-4c2,1.5 3,4 3,7c0,8 -8,15 -16,19c-2,1 -5,1 -7,-1c-3,-3 -4,-12 -0,-21Z" />
+    <path
+        android:fillColor="#7A925C"
+        android:pathData="M36,32c-4,-6 -14,-8 -20,-4c-2,1.5 -3,4 -3,7c0,8 8,15 16,19c2,1 5,1 7,-1c3,-3 4,-12 0,-21Z" />
+    <path
+        android:fillColor="#9CB47E"
+        android:pathData="M54,75c0,8 4,16 10,21c2,2 5,2 7,-1c5,-5 8,-12 8,-20c0,-4 -3,-7 -7,-7c-7,0 -18,7 -11,7" />
+
+    <!-- Detailed Sakura Petals -->
+    <!-- Top Petal -->
+    <path android:pathData="M54,22c-8,0 -15,7 -15,15c0,8 15,22 15,22s15,-14 15,-22C69,29 62,22 54,22Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="54" android:centerY="37" android:gradientRadius="15">
+                <item android:offset="0" android:color="#FFF0F5" />
+                <item android:offset="1" android:color="#F9BAD2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Right Top Petal -->
+    <path android:pathData="M84,45c2,-8 -3,-16 -11,-18c-8,-2 -19,10 -19,10s14,13 22,11C82,57 82,53 84,45Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="70" android:centerY="45" android:gradientRadius="15">
+                <item android:offset="0" android:color="#FFF0F5" />
+                <item android:offset="1" android:color="#F9BAD2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Right Bottom Petal -->
+    <path android:pathData="M74,78c6,5 15,3 19,-3c4,-6 -1,-19 -1,-19s-17,0 -22,5c-5,5 -2,12 4,17Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="75" android:centerY="65" android:gradientRadius="15">
+                <item android:offset="0" android:color="#FFF0F5" />
+                <item android:offset="1" android:color="#F9BAD2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Left Bottom Petal -->
+    <path android:pathData="M34,78c-6,5 -15,3 -19,-3c-4,-6 1,-19 1,-19s17,0 22,5c5,5 2,12 -4,17Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="33" android:centerY="65" android:gradientRadius="15">
+                <item android:offset="0" android:color="#FFF0F5" />
+                <item android:offset="1" android:color="#F9BAD2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Left Top Petal -->
+    <path android:pathData="M24,45c-2,-8 3,-16 11,-18c8,-2 19,10 19,10s-14,13 -22,11C26,57 26,53 24,45Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="38" android:centerY="45" android:gradientRadius="15">
+                <item android:offset="0" android:color="#FFF0F5" />
+                <item android:offset="1" android:color="#F9BAD2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Center Stamen Detail -->
+    <path
+        android:fillColor="#E88732"
+        android:pathData="M54,54m-6,0a6,6 0 1,0 12,0a6,6 0 1,0 -12,0" />
+
+    <!-- Stamen Filaments -->
+    <path android:strokeColor="#FFD700" android:strokeWidth="0.5" android:pathData="M54,54L54,42M54,54L62,48M54,54L62,60M54,54L46,60M54,54L46,48" />
+    <path android:fillColor="#FFD700" android:pathData="M54,41m-1,0a1,1 0 1,0 2,0a1,1 0 1,0 -2,0 M63,47m-1,0a1,1 0 1,0 2,0a1,1 0 1,0 -2,0 M63,61m-1,0a1,1 0 1,0 2,0a1,1 0 1,0 -2,0 M45,61m-1,0a1,1 0 1,0 2,0a1,1 0 1,0 -2,0 M45,47m-1,0a1,1 0 1,0 2,0a1,1 0 1,0 -2,0" />
+
+</vector>

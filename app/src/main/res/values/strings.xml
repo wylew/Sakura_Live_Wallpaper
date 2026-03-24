@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sakura Live Wallpaper</string>
+    <string name="settings_title">Sakura Wallpaper Settings</string>
+    <string name="pref_petal_count">Number of Petals</string>
+    <string name="pref_wind_strength">Wind Strength</string>
+    <string name="pref_petal_size">Petal Size</string>
+    <string name="pref_fall_speed">Fall Speed</string>
+    <string name="pref_rotation_speed">Rotation Speed</string>
+    <string name="pref_petal_color">Petal Color</string>
+    <string name="pref_transparency">Transparency</string>
+    <string name="pref_background_image">Background Image</string>
+    <string name="pref_collect_at_bottom">Collect at Bottom</string>
+</resources>

@@ -1,0 +1,142 @@
+package com.wylew.sakuralivewallpaper
+
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.random.Random
+
+class Petal(
+    var screenWidth: Int,
+    var screenHeight: Int,
+    var count: Int,
+    var windStrength: Float,
+    var size: Float,
+    var speed: Float,
+    var color: Int,
+    var alpha: Int,
+    var collectAtBottom: Boolean,
+    var rotationSpeed: Float
+) {
+    private var x = Random.nextFloat() * screenWidth
+    private var y = Random.nextFloat() * screenHeight
+    
+    // Independent rotation states
+    private var rotationX = Random.nextFloat() * 360f
+    private var rotationY = Random.nextFloat() * 360f
+    private var rotationZ = Random.nextFloat() * 360f
+    
+    // Randomized baseline rotation speeds
+    private var baseRotSpeedX = (Random.nextFloat() - 0.5f) * 0.04f
+    private var baseRotSpeedY = (Random.nextFloat() - 0.5f) * 0.1f
+    private var baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
+
+    // Randomized movement parameters
+    private var swayOffset = Random.nextFloat() * Math.PI.toFloat() * 2
+    private var swaySpeed = 0.5f + Random.nextFloat() * 1.5f
+    private var horizontalDrift = (Random.nextFloat() - 0.5f) * 30f
+    private var verticalOscillationOffset = Random.nextFloat() * Math.PI.toFloat() * 2
+    private var verticalOscillationSpeed = 0.5f + Random.nextFloat() * 1f
+    
+    private var isGrounded = false
+    private val path = Path()
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    init {
+        createSakuraPath()
+    }
+
+    private fun createSakuraPath() {
+        path.reset()
+        val s = size
+        path.moveTo(0f, s)
+        path.cubicTo(s * 1.2f, s * 0.5f, s * 1.2f, -s * 0.5f, s * 0.3f, -s)
+        path.lineTo(0f, -s * 0.7f)
+        path.lineTo(-s * 0.3f, -s)
+        path.cubicTo(-s * 1.2f, -s * 0.5f, -s * 1.2f, s * 0.5f, 0f, s)
+        path.close()
+    }
+
+    fun update(deltaTime: Float) {
+        if (isGrounded) return
+
+        // Base vertical movement with slight individual oscillation (air resistance simulation)
+        verticalOscillationOffset += deltaTime * verticalOscillationSpeed
+        val vOsc = sin(verticalOscillationOffset.toDouble()).toFloat() * 15f
+        val baseSpeed = (40f + speed * 160f) + vOsc
+        y += baseSpeed * deltaTime
+        
+        // Horizontal movement: Wind + Periodic Sway + Individual Drift
+        swayOffset += deltaTime * swaySpeed
+        val swayAmplitude = 15f + windStrength * 120f
+        val breeze = sin(swayOffset.toDouble()).toFloat() * swayAmplitude
+        
+        // Add a secondary, slower wave for "gust" simulation
+        val gust = sin(swayOffset.toDouble() * 0.3).toFloat() * (windStrength * 40f)
+        
+        val windDrift = windStrength * 250f
+        x += (windDrift + breeze + gust + horizontalDrift) * deltaTime
+        
+        // Update rotations
+        rotationX += baseRotSpeedX * rotationSpeed
+        rotationY += baseRotSpeedY * rotationSpeed
+        rotationZ += baseRotSpeedZ * rotationSpeed
+
+        // Grounding or Reset
+        if (y > screenHeight) {
+            if (collectAtBottom && Random.nextFloat() < 0.15f) {
+                y = screenHeight - (Random.nextFloat() * size * 0.8f)
+                isGrounded = true
+            } else {
+                reset()
+            }
+        }
+        
+        // Wrap horizontally with padding
+        if (x > screenWidth + size * 4) x = -size * 2
+        if (x < -size * 4) x = screenWidth.toFloat() + size * 2
+    }
+
+    fun reset() {
+        x = Random.nextFloat() * screenWidth
+        y = -size * 4 // Start further above screen
+        isGrounded = false
+        swayOffset = Random.nextFloat() * Math.PI.toFloat() * 2
+        horizontalDrift = (Random.nextFloat() - 0.5f) * 30f
+        verticalOscillationOffset = Random.nextFloat() * Math.PI.toFloat() * 2
+        
+        // Re-randomize speeds slightly on reset for variety
+        baseRotSpeedX = (Random.nextFloat() - 0.5f) * 0.04f
+        baseRotSpeedY = (Random.nextFloat() - 0.5f) * 0.1f
+        baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
+    }
+
+    fun draw(canvas: Canvas) {
+        paint.color = color
+        paint.alpha = alpha
+        
+        canvas.save()
+        canvas.translate(x, y)
+        
+        val scaleX = cos(rotationX.toDouble()).toFloat()
+        val scaleY = sin(rotationY.toDouble()).toFloat()
+        
+        canvas.scale(scaleX, scaleY)
+        canvas.rotate(rotationZ)
+        
+        createSakuraPath()
+        canvas.drawPath(path, paint)
+        canvas.restore()
+    }
+    
+    fun updateSettings(size: Float, windStrength: Float, speed: Float, color: Int, alpha: Int, collectAtBottom: Boolean, rotationSpeed: Float) {
+        this.size = size
+        this.windStrength = windStrength
+        this.speed = speed
+        this.color = color
+        this.alpha = alpha
+        this.collectAtBottom = collectAtBottom
+        this.rotationSpeed = rotationSpeed
+    }
+}
