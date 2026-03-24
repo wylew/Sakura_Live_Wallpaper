@@ -64,25 +64,32 @@ class WallpaperPreviewView @JvmOverloads constructor(
                     petals.add(Petal(width, height, count, wind, size, speed, color, alpha, collect, rotSpeed))
                 }
             } else {
-                petals.forEach { it.updateSettings(size, wind, speed, color, alpha, collect, rotSpeed) }
+                petals.forEach { 
+                    it.screenWidth = width
+                    it.screenHeight = height
+                    it.updateSettings(size, wind, speed, color, alpha, collect, rotSpeed) 
+                }
             }
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         val currentTime = System.currentTimeMillis()
-        val deltaTime = (currentTime - lastTime) / 1000f
+        val deltaTime = ((currentTime - lastTime) / 1000f).coerceAtMost(0.1f)
         lastTime = currentTime
 
         drawBackground(canvas)
 
         petals.forEach {
             it.update(deltaTime)
+            if (it.y > height + it.size * 4) {
+                it.reset()
+            }
             it.draw(canvas)
         }
 
         if (running) {
-            invalidate()
+            postInvalidateOnAnimation()
         }
     }
 

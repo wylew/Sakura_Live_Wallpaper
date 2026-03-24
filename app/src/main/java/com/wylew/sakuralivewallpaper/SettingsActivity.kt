@@ -6,11 +6,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.SeekBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.slider.Slider
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -30,97 +30,82 @@ class SettingsActivity : AppCompatActivity() {
 
         previewView = findViewById(R.id.wallpaper_preview)
 
-        setupSeekBars()
+        setupSliders()
         setupButtons()
-        setupCheckbox()
+        setupSwitch()
     }
 
-    private fun setupSeekBars() {
-        findViewById<SeekBar>(R.id.sb_petal_count).apply {
-            max = WallpaperConfig.PETAL_COUNT_MAX
-            progress = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    prefs.edit().putInt("petal_count", progress.coerceAtLeast(WallpaperConfig.PETAL_COUNT_MIN)).apply()
-                }
-            })
+    private fun setupSliders() {
+        findViewById<Slider>(R.id.slider_petal_count).apply {
+            valueFrom = WallpaperConfig.PETAL_COUNT_MIN.toFloat()
+            valueTo = WallpaperConfig.PETAL_COUNT_MAX.toFloat()
+            value = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT).toFloat().coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putInt("petal_count", value.toInt()).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_wind_strength).apply {
-            max = 100
-            val current = prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT)
-            progress = ((current - WallpaperConfig.WIND_STRENGTH_MIN) / (WallpaperConfig.WIND_STRENGTH_MAX - WallpaperConfig.WIND_STRENGTH_MIN) * 100).toInt()
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = WallpaperConfig.WIND_STRENGTH_MIN + (progress / 100f) * (WallpaperConfig.WIND_STRENGTH_MAX - WallpaperConfig.WIND_STRENGTH_MIN)
-                    prefs.edit().putFloat("wind_strength", value).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_wind_strength).apply {
+            valueFrom = WallpaperConfig.WIND_STRENGTH_MIN
+            valueTo = WallpaperConfig.WIND_STRENGTH_MAX
+            value = prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("wind_strength", value).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_petal_size).apply {
-            max = 100
-            val current = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT)
-            progress = ((current - WallpaperConfig.PETAL_SIZE_MIN) / (WallpaperConfig.PETAL_SIZE_MAX - WallpaperConfig.PETAL_SIZE_MIN) * 100).toInt()
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = WallpaperConfig.PETAL_SIZE_MIN + (progress / 100f) * (WallpaperConfig.PETAL_SIZE_MAX - WallpaperConfig.PETAL_SIZE_MIN)
-                    prefs.edit().putFloat("petal_size", value).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_petal_size).apply {
+            valueFrom = WallpaperConfig.PETAL_SIZE_MIN
+            valueTo = WallpaperConfig.PETAL_SIZE_MAX
+            value = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("petal_size", value).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_fall_speed).apply {
-            max = 100
-            val current = prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT)
-            progress = ((current - WallpaperConfig.FALL_SPEED_MIN) / (WallpaperConfig.FALL_SPEED_MAX - WallpaperConfig.FALL_SPEED_MIN) * 100).toInt()
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = WallpaperConfig.FALL_SPEED_MIN + (progress / 100f) * (WallpaperConfig.FALL_SPEED_MAX - WallpaperConfig.FALL_SPEED_MIN)
-                    prefs.edit().putFloat("fall_speed", value).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_fall_speed).apply {
+            valueFrom = WallpaperConfig.FALL_SPEED_MIN
+            valueTo = WallpaperConfig.FALL_SPEED_MAX
+            value = prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("fall_speed", value).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_rotation_speed).apply {
-            max = 100
-            val current = prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT)
-            progress = ((current - WallpaperConfig.ROTATION_SPEED_MIN) / (WallpaperConfig.ROTATION_SPEED_MAX - WallpaperConfig.ROTATION_SPEED_MIN) * 100).toInt()
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = WallpaperConfig.ROTATION_SPEED_MIN + (progress / 100f) * (WallpaperConfig.ROTATION_SPEED_MAX - WallpaperConfig.ROTATION_SPEED_MIN)
-                    prefs.edit().putFloat("rotation_speed", value).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_rotation_speed).apply {
+            valueFrom = WallpaperConfig.ROTATION_SPEED_MIN
+            valueTo = WallpaperConfig.ROTATION_SPEED_MAX
+            value = prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("rotation_speed", value).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_petal_color).apply {
-            max = 100
-            progress = calculateColorProgress(prefs.getInt("petal_color", WallpaperConfig.COLOR_START))
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    prefs.edit().putInt("petal_color", interpolateColor(progress / 100f)).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_petal_color).apply {
+            valueFrom = 0f
+            valueTo = 100f
+            value = calculateColorProgress(prefs.getInt("petal_color", WallpaperConfig.COLOR_START)).toFloat()
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putInt("petal_color", interpolateColor(value / 100f)).apply()
+            }
         }
 
-        findViewById<SeekBar>(R.id.sb_transparency).apply {
-            max = WallpaperConfig.ALPHA_MAX
-            progress = prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT)
-            setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    prefs.edit().putInt("petal_alpha", progress.coerceAtLeast(WallpaperConfig.ALPHA_MIN)).apply()
-                }
-            })
+        findViewById<Slider>(R.id.slider_transparency).apply {
+            valueFrom = WallpaperConfig.ALPHA_MIN.toFloat()
+            valueTo = WallpaperConfig.ALPHA_MAX.toFloat()
+            value = prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT).toFloat().coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putInt("petal_alpha", value.toInt()).apply()
+            }
         }
     }
 
     private fun setupButtons() {
-        findViewById<Button>(R.id.btn_select_background).setOnClickListener {
+        findViewById<MaterialButton>(R.id.btn_select_background).setOnClickListener {
             pickImage.launch("image/*")
         }
 
-        findViewById<Button>(R.id.btn_set_wallpaper).setOnClickListener {
+        findViewById<MaterialButton>(R.id.btn_set_wallpaper).setOnClickListener {
             val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                 ComponentName(this, SakuraWallpaperService::class.java))
@@ -128,8 +113,8 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupCheckbox() {
-        findViewById<CheckBox>(R.id.cb_collect_at_bottom).apply {
+    private fun setupSwitch() {
+        findViewById<MaterialSwitch>(R.id.switch_collect_at_bottom).apply {
             isChecked = prefs.getBoolean("collect_at_bottom", false)
             setOnCheckedChangeListener { _, isChecked ->
                 prefs.edit().putBoolean("collect_at_bottom", isChecked).apply()
@@ -162,11 +147,5 @@ class SettingsActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         previewView.stop()
-    }
-
-    open class SimpleSeekBarChangeListener : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {}
-        override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-        override fun onStopTrackingTouch(seekBar: SeekBar?) {}
     }
 }
