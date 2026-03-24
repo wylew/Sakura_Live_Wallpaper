@@ -57,7 +57,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_petal_count"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_petal_count"
@@ -71,7 +72,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_petal_size"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_petal_size"
@@ -85,7 +87,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_petal_color"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_petal_color"
@@ -100,10 +103,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_collect_at_bottom"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark"
-                            android:textOn=""
-                            android:textOff=""
+                            android:textOn=" "
+                            android:textOff=" "
                             app:showText="false" />
                     </LinearLayout>
 
@@ -119,7 +123,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_wind_strength"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_wind_strength"
@@ -133,7 +138,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_fall_speed"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_fall_speed"
@@ -147,7 +153,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_rotation_speed"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_rotation_speed"
@@ -161,7 +168,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/pref_transparency"
-                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textSize="16sp"
                             android:textColor="@color/sakura_text_dark" />
                         <com.google.android.material.slider.Slider
                             android:id="@+id/slider_transparency"
@@ -182,6 +190,7 @@
                     android:layout_marginTop="24dp"
                     android:text="Set Wallpaper"
                     android:textColor="@color/sakura_text_dark"
+                    android:textSize="16sp"
                     app:backgroundTint="@color/sakura_green"
                     app:cornerRadius="16dp"
                     app:icon="@android:drawable/ic_menu_set_as"
@@ -225,6 +234,7 @@
                         android:layout_margin="16dp"
                         android:text="@string/pref_background_image"
                         android:textColor="@color/sakura_text_dark"
+                        android:textSize="14sp"
                         app:backgroundTint="#CCFFB6C1"
                         app:cornerRadius="16dp"
                         app:icon="@android:drawable/ic_menu_gallery"
