@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
-import android.os.Build
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -95,17 +94,10 @@ class Petal(
             
             canvas.drawPath(path, paint)
             
-            // Optimization: Convert to HARDWARE bitmap if supported (API 26+)
-            val finalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val hwBitmap = softwareBitmap.copy(Bitmap.Config.HARDWARE, false)
-                softwareBitmap.recycle()
-                hwBitmap ?: softwareBitmap
-            } else {
-                softwareBitmap
-            }
-            
-            cachedBitmap = finalBitmap
-            return finalBitmap
+            // Fixed: We MUST NOT use HARDWARE bitmaps here because they cannot be 
+            // drawn into the software-backed groundedLayerCanvas.
+            cachedBitmap = softwareBitmap
+            return softwareBitmap
         }
         
         fun clearCache() {
@@ -189,6 +181,14 @@ class Petal(
         baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
         
         updateRotationalConstants()
+    }
+
+    fun settle() {
+        isGrounded = true
+        // Ensure the petal is flattened and visible when grounded
+        cachedScaleX = 0.8f + Random.nextFloat() * 0.2f
+        cachedScaleY = 0.8f + Random.nextFloat() * 0.2f
+        rotationZ = Random.nextFloat() * 360f
     }
 
     fun blowAway() {

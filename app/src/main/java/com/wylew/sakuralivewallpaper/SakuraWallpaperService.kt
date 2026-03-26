@@ -168,7 +168,7 @@ class SakuraWallpaperService : WallpaperService() {
                     groundedPetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed) }
                 }
                 
-                if (collect && groundedPetals.isNotEmpty()) {
+                if (collect) {
                     redrawGroundedLayer()
                 }
             }
