@@ -4,7 +4,7 @@ import android.graphics.Color
 
 object WallpaperConfig {
     // Petal Count
-    const val PETAL_COUNT_MIN = 25
+    const val PETAL_COUNT_MIN = 50
     const val PETAL_COUNT_MAX = 500
     const val PETAL_COUNT_DEFAULT = 150
 
