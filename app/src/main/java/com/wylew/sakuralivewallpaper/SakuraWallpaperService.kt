@@ -7,11 +7,13 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.service.wallpaper.WallpaperService
@@ -31,9 +33,18 @@ class SakuraWallpaperService : WallpaperService() {
         private val handler = Handler(Looper.getMainLooper())
         private var visible = false
         private var lastTime = System.currentTimeMillis()
+        private var lastLogTime = System.currentTimeMillis()
+        private var spawnsInInterval = 0
         
-        private val allPetals = mutableListOf<Petal>()
+        private val activePetals = mutableListOf<Petal>()
+        private val groundedPetals = mutableListOf<Petal>()
+        
         private var backgroundBitmap: Bitmap? = null
+        private var groundedLayerBitmap: Bitmap? = null
+        private var groundedLayerCanvas: Canvas? = null
+        
+        private val backgroundMatrix = Matrix()
+        
         private val prefs: SharedPreferences by lazy {
             getSharedPreferences("sakura_prefs", MODE_PRIVATE)
         }
@@ -41,8 +52,6 @@ class SakuraWallpaperService : WallpaperService() {
         private lateinit var sensorManager: SensorManager
         private var accelerometer: Sensor? = null
         
-        private var spawnAccumulator = 0f
-
         private val drawRunner = object : Runnable {
             override fun run() {
                 draw()
@@ -60,6 +69,7 @@ class SakuraWallpaperService : WallpaperService() {
             this.visible = visible
             if (visible) {
                 lastTime = System.currentTimeMillis()
+                lastLogTime = System.currentTimeMillis()
                 accelerometer?.let {
                     sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
                 }
@@ -75,6 +85,10 @@ class SakuraWallpaperService : WallpaperService() {
             visible = false
             sensorManager.unregisterListener(this)
             handler.removeCallbacks(drawRunner)
+            
+            groundedLayerBitmap?.recycle()
+            groundedLayerBitmap = null
+            groundedLayerCanvas = null
         }
 
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -87,7 +101,14 @@ class SakuraWallpaperService : WallpaperService() {
                 try {
                     val uri = Uri.parse(it)
                     contentResolver.openInputStream(uri)?.use { stream ->
-                        backgroundBitmap = BitmapFactory.decodeStream(stream)
+                        val softwareBitmap = BitmapFactory.decodeStream(stream)
+                        backgroundBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && softwareBitmap != null) {
+                            val hwBitmap = softwareBitmap.copy(Bitmap.Config.HARDWARE, false)
+                            softwareBitmap.recycle()
+                            hwBitmap ?: softwareBitmap
+                        } else {
+                            softwareBitmap
+                        }
                     }
                 } catch (e: Exception) {
                     backgroundBitmap = null
@@ -98,6 +119,7 @@ class SakuraWallpaperService : WallpaperService() {
             val height = surfaceHolder.surfaceFrame.height()
             
             if (width > 0 && height > 0) {
+                val targetCount = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
                 val wind = prefs.getFloat("wind_strength", 0.5f)
                 val size = prefs.getFloat("petal_size", 20f)
                 val speed = prefs.getFloat("fall_speed", 0.5f)
@@ -106,7 +128,55 @@ class SakuraWallpaperService : WallpaperService() {
                 val alpha = prefs.getInt("petal_alpha", 200)
                 val collect = prefs.getBoolean("collect_at_bottom", false)
 
-                allPetals.forEach { it.updateSettings(size, wind, speed, color, alpha, collect, rotSpeed) }
+                val oldWidth = activePetals.firstOrNull()?.screenWidth ?: 0
+                val oldHeight = activePetals.firstOrNull()?.screenHeight ?: 0
+                val isRotation = (width != oldWidth || height != oldHeight) && oldWidth > 0
+
+                if (!collect) {
+                    groundedPetals.clear()
+                    groundedLayerBitmap?.eraseColor(Color.TRANSPARENT)
+                }
+
+                if (isRotation) {
+                    activePetals.clear()
+                    val prepopulateCount = (targetCount * 0.8f).toInt()
+                    repeat(prepopulateCount) {
+                        val p = createNewPetal(width, height)
+                        p.reset(fullRandomY = true)
+                        activePetals.add(p)
+                    }
+                } else {
+                    if (activePetals.size < targetCount) {
+                        repeat(targetCount - activePetals.size) {
+                            val p = createNewPetal(width, height)
+                            p.reset(fullRandomY = true)
+                            activePetals.add(p)
+                        }
+                    }
+                }
+
+                activePetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed) }
+                groundedPetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed) }
+                
+                if (collect && groundedPetals.isNotEmpty()) {
+                    redrawGroundedLayer()
+                }
+            }
+        }
+
+        private fun redrawGroundedLayer() {
+            groundedLayerBitmap?.eraseColor(Color.TRANSPARENT)
+            groundedPetals.forEach { p ->
+                groundedLayerCanvas?.let { p.draw(it) }
+            }
+        }
+
+        private fun ensureGroundedLayer(width: Int, height: Int) {
+            if (groundedLayerBitmap == null || groundedLayerBitmap!!.width != width || groundedLayerBitmap!!.height != height) {
+                groundedLayerBitmap?.recycle()
+                groundedLayerBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                groundedLayerCanvas = Canvas(groundedLayerBitmap!!)
+                redrawGroundedLayer()
             }
         }
 
@@ -114,72 +184,74 @@ class SakuraWallpaperService : WallpaperService() {
             val holder = surfaceHolder
             var canvas: Canvas? = null
             try {
-                canvas = holder.lockCanvas()
+                // Optimization: Use Hardware Canvas if available (API 26+)
+                canvas = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    holder.lockHardwareCanvas()
+                } else {
+                    holder.lockCanvas()
+                }
+                
                 if (canvas != null) {
                     val currentTime = System.currentTimeMillis()
-                    // Cap deltaTime to avoid huge jumps on wake/lag
-                    val deltaTime = ((currentTime - lastTime) / 1000f).coerceAtMost(0.05f)
+                    val deltaTime = ((currentTime - lastTime) / 1000f).coerceAtMost(0.033f)
                     lastTime = currentTime
 
+                    ensureGroundedLayer(canvas.width, canvas.height)
                     drawBackground(canvas)
+                    
+                    groundedLayerBitmap?.let { canvas.drawBitmap(it, 0f, 0f, null) }
 
                     val collect = prefs.getBoolean("collect_at_bottom", false)
                     val targetCount = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
-                    
-                    val currentFallingCount = allPetals.count { !it.isGrounded && !it.isBlowingAway }
-                    val groundedCount = allPetals.count { it.isGrounded }
-                    
-                    // Dynamic spawn rate: faster if we are empty, but always capped
-                    val baseSpawnRate = (targetCount / 10f).coerceIn(2f, 15f) 
-                    
-                    if (currentFallingCount < targetCount) {
-                        spawnAccumulator += deltaTime * baseSpawnRate
-                        while (spawnAccumulator >= 1f && allPetals.count { !it.isGrounded && !it.isBlowingAway } < targetCount) {
-                            val p = createNewPetal(canvas.width, canvas.height, targetCount, collect)
-                            p.y = -p.size * 5 // Spawn well above screen
-                            allPetals.add(p)
-                            spawnAccumulator -= 1f
-                        }
-                    }
-                    if (spawnAccumulator > 1f) spawnAccumulator = 1f
 
-                    val iterator = allPetals.iterator()
-                    var fallingTracker = currentFallingCount
-                    
-                    while (iterator.hasNext()) {
-                        val p = iterator.next()
-                        
-                        if (!p.isGrounded) {
-                            p.update(deltaTime)
-                            
-                            val isOffBottom = p.y > canvas.height + p.size * 4
-                            val isBlowingOffScreen = p.isBlowingAway && (p.y < -p.size * 10 || p.x < -p.size * 10 || p.x > canvas.width + p.size * 10)
+                    val activeIterator = activePetals.iterator()
+                    while (activeIterator.hasNext()) {
+                        val p = activeIterator.next()
+                        p.update(deltaTime)
+                        p.draw(canvas)
 
-                            if (isOffBottom || isBlowingOffScreen) {
-                                // If we have too many petals already, remove this one to prevent "waves"
-                                if (fallingTracker > targetCount) {
-                                    iterator.remove()
-                                    fallingTracker--
+                        val isOffBottom = p.y > canvas.height + p.size * 4
+                        val isBlowingOffScreen = p.isBlowingAway && (p.y < -p.size * 10 || p.x < -p.size * 10 || p.x > canvas.width + p.size * 10)
+
+                        if (isOffBottom || isBlowingOffScreen) {
+                            if (isOffBottom && !p.isBlowingAway && collect && groundedPetals.size < WallpaperConfig.MAX_GROUNDED_PETALS) {
+                                if (Random.nextFloat() < WallpaperConfig.SETTLE_PROBABILITY) {
+                                    val maxPileY = canvas.height * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
+                                    p.y = canvas.height - (Random.nextFloat() * (canvas.height - maxPileY))
+                                    p.isGrounded = true
+                                    groundedPetals.add(p)
+                                    groundedLayerCanvas?.let { p.draw(it) }
+                                    activeIterator.remove()
                                     continue
                                 }
+                            }
 
-                                if (isOffBottom && !p.isBlowingAway && collect && groundedCount < WallpaperConfig.MAX_GROUNDED_PETALS) {
-                                    if (Random.nextFloat() < WallpaperConfig.SETTLE_PROBABILITY) {
-                                        val maxPileY = canvas.height * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
-                                        p.y = canvas.height - (Random.nextFloat() * (canvas.height - maxPileY))
-                                        p.isGrounded = true
-                                        fallingTracker--
-                                    } else {
-                                        p.reset()
-                                    }
-                                } else {
-                                    p.reset()
-                                }
+                            if (activePetals.size > targetCount) {
+                                activeIterator.remove()
+                            } else {
+                                p.reset()
+                                spawnsInInterval++
                             }
                         }
-                        p.draw(canvas)
+                    }
+
+                    while (activePetals.size < targetCount) {
+                        val p = createNewPetal(canvas.width, canvas.height)
+                        p.reset()
+                        activePetals.add(p)
+                        spawnsInInterval++
+                    }
+
+                    if (currentTime - lastLogTime > 2000) {
+                        val elapsedSeconds = (currentTime - lastLogTime) / 1000f
+                        val spawnRate = if (elapsedSeconds > 0) spawnsInInterval / elapsedSeconds else 0f
+                        Log.v(TAG, "Stats -> Falling: ${activePetals.size}, Grounded: ${groundedPetals.size}, Total: ${activePetals.size + groundedPetals.size}, Spawning: ${"%.2f".format(spawnRate)}/s (Total: $spawnsInInterval)")
+                        lastLogTime = currentTime
+                        spawnsInInterval = 0
                     }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Draw error", e)
             } finally {
                 if (canvas != null) {
                     holder.unlockCanvasAndPost(canvas)
@@ -192,17 +264,17 @@ class SakuraWallpaperService : WallpaperService() {
             }
         }
 
-        private fun createNewPetal(width: Int, height: Int, count: Int, collect: Boolean): Petal {
+        private fun createNewPetal(width: Int, height: Int): Petal {
             return Petal(
                 width,
                 height,
-                count,
+                0,
                 prefs.getFloat("wind_strength", 0.5f),
                 prefs.getFloat("petal_size", 20f),
                 prefs.getFloat("fall_speed", 0.5f),
                 prefs.getInt("petal_color", Color.WHITE),
                 prefs.getInt("petal_alpha", 200),
-                collect,
+                prefs.getBoolean("collect_at_bottom", false),
                 prefs.getFloat("rotation_speed", 1.0f)
             )
         }
@@ -216,10 +288,11 @@ class SakuraWallpaperService : WallpaperService() {
                 val scale = if (bitmapWidth * canvasHeight > canvasWidth * bitmapHeight) canvasHeight / bitmapHeight else canvasWidth / bitmapWidth
                 val dx = (canvasWidth - bitmapWidth * scale) * 0.5f
                 val dy = (canvasHeight - bitmapHeight * scale) * 0.5f
-                val matrix = Matrix()
-                matrix.setScale(scale, scale)
-                matrix.postTranslate(dx, dy)
-                canvas.drawBitmap(bitmap, matrix, null)
+                
+                backgroundMatrix.reset()
+                backgroundMatrix.setScale(scale, scale)
+                backgroundMatrix.postTranslate(dx, dy)
+                canvas.drawBitmap(bitmap, backgroundMatrix, null)
             } ?: canvas.drawColor(Color.BLACK)
         }
 
@@ -231,7 +304,15 @@ class SakuraWallpaperService : WallpaperService() {
                 val gForce = sqrt(x*x + y*y + z*z) / SensorManager.GRAVITY_EARTH
                 
                 if (gForce > (WallpaperConfig.SHAKE_THRESHOLD / 9.81f) + 1.0f) {
-                    allPetals.forEach { it.blowAway() }
+                    if (groundedPetals.isNotEmpty()) {
+                        groundedPetals.forEach { 
+                            it.blowAway()
+                            activePetals.add(it)
+                        }
+                        groundedPetals.clear()
+                        groundedLayerBitmap?.eraseColor(Color.TRANSPARENT)
+                        Log.d(TAG, "Shake detected! Grounded cleared. Active count: ${activePetals.size}")
+                    }
                 }
             }
         }
@@ -248,6 +329,10 @@ class SakuraWallpaperService : WallpaperService() {
             prefs.unregisterOnSharedPreferenceChangeListener(this)
             sensorManager.unregisterListener(this)
             handler.removeCallbacks(drawRunner)
+            
+            groundedLayerBitmap?.recycle()
+            groundedLayerBitmap = null
+            groundedLayerCanvas = null
         }
     }
 }

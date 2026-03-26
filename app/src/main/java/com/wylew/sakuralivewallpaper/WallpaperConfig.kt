@@ -20,8 +20,8 @@ object WallpaperConfig {
 
     // Fall Speed
     const val FALL_SPEED_MIN = 0.0f
-    const val FALL_SPEED_MAX = 1.0f
-    const val FALL_SPEED_DEFAULT = 0.5f
+    const val FALL_SPEED_MAX = 0.5f
+    const val FALL_SPEED_DEFAULT = 0.15f
 
     // Rotation Speed
     const val ROTATION_SPEED_MIN = 0.0f
@@ -41,5 +41,5 @@ object WallpaperConfig {
     const val SETTLE_PROBABILITY = 0.15f // 50% chance to settle
     const val MAX_PILE_HEIGHT_PERCENT = 0.10f // 15% of screen height
     const val SHAKE_THRESHOLD = 12.0f // Sensitivity for shake detection
-    const val MAX_GROUNDED_PETALS = 1500 // Maximum number of petals that can settle at the bottom
+    const val MAX_GROUNDED_PETALS = 750 // Maximum number of petals that can settle at the bottom
 }

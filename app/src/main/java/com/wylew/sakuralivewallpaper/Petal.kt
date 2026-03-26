@@ -1,8 +1,11 @@
 package com.wylew.sakuralivewallpaper
 
+import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
+import android.os.Build
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -19,8 +22,8 @@ class Petal(
     var collectAtBottom: Boolean,
     var rotationSpeed: Float
 ) {
-    var x = Random.nextFloat() * screenWidth
-    var y = Random.nextFloat() * screenHeight
+    var x = 0f
+    var y = 0f
     
     private var rotationX = Random.nextFloat() * 360f
     private var rotationY = Random.nextFloat() * 360f
@@ -41,22 +44,92 @@ class Petal(
     private var blowAwaySpeedX = 0f
     private var blowAwaySpeedY = 0f
 
-    private val path = Path()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val transformationMatrix = Matrix()
 
-    init {
-        createSakuraPath()
+    // Cached values for draw performance
+    private var cachedScaleX = 1f
+    private var cachedScaleY = 1f
+    private var cachedBw = 0f
+    private var cachedBh = 0f
+    private var petalBitmap: Bitmap? = null
+
+    companion object {
+        private var cachedBitmap: Bitmap? = null
+        private var lastSize = -1f
+        private var lastColor = -1
+
+        private fun getOrCreateBitmap(size: Float, color: Int): Bitmap {
+            if (cachedBitmap != null && lastSize == size && lastColor == color && !cachedBitmap!!.isRecycled) {
+                return cachedBitmap!!
+            }
+            
+            lastSize = size
+            lastColor = color
+            
+            val padding = 2f
+            val bw = (size * 2.4f) + padding * 2
+            val bh = (size * 2f) + padding * 2
+            
+            val softwareBitmap = Bitmap.createBitmap(
+                bw.toInt().coerceAtLeast(1), 
+                bh.toInt().coerceAtLeast(1), 
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(softwareBitmap)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                this.color = color
+            }
+            
+            val cx = size * 1.2f + padding
+            val cy = size + padding
+            val s = size
+            
+            val path = Path()
+            path.moveTo(cx, cy + s)
+            path.cubicTo(cx + s * 1.2f, cy + s * 0.5f, cx + s * 1.2f, cy - s * 0.5f, cx + s * 0.3f, cy - s)
+            path.lineTo(cx, cy - s * 0.7f)
+            path.lineTo(cx - s * 0.3f, cy - s)
+            path.cubicTo(cx - s * 1.2f, cy - s * 0.5f, cx - s * 1.2f, cy + s * 0.5f, cx, cy + s)
+            path.close()
+            
+            canvas.drawPath(path, paint)
+            
+            // Optimization: Convert to HARDWARE bitmap if supported (API 26+)
+            val finalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val hwBitmap = softwareBitmap.copy(Bitmap.Config.HARDWARE, false)
+                softwareBitmap.recycle()
+                hwBitmap ?: softwareBitmap
+            } else {
+                softwareBitmap
+            }
+            
+            cachedBitmap = finalBitmap
+            return finalBitmap
+        }
+        
+        fun clearCache() {
+            cachedBitmap?.recycle()
+            cachedBitmap = null
+            lastSize = -1f
+            lastColor = -1
+        }
     }
 
-    private fun createSakuraPath() {
-        path.reset()
-        val s = size
-        path.moveTo(0f, s)
-        path.cubicTo(s * 1.2f, s * 0.5f, s * 1.2f, -s * 0.5f, s * 0.3f, -s)
-        path.lineTo(0f, -s * 0.7f)
-        path.lineTo(-s * 0.3f, -s)
-        path.cubicTo(-s * 1.2f, -s * 0.5f, -s * 1.2f, s * 0.5f, 0f, s)
-        path.close()
+    init {
+        updateCachedDimensions()
+        updatePetalBitmap()
+        reset(fullRandomY = true)
+    }
+
+    private fun updateCachedDimensions() {
+        val padding = 2f
+        cachedBw = (size * 2.4f) + padding * 2
+        cachedBh = (size * 2f) + padding * 2
+    }
+
+    private fun updatePetalBitmap() {
+        petalBitmap = getOrCreateBitmap(size, color)
     }
 
     fun update(deltaTime: Float) {
@@ -67,8 +140,7 @@ class Petal(
             y += blowAwaySpeedY * deltaTime
             blowAwaySpeedY += 500f * deltaTime // Gravity
             rotationZ += 10f
-            
-            // Boundary check for blowing away handled by service or here
+            updateRotationalConstants()
             return
         }
 
@@ -85,15 +157,27 @@ class Petal(
         rotationX += baseRotSpeedX * rotationSpeed
         rotationY += baseRotSpeedY * rotationSpeed
         rotationZ += baseRotSpeedZ * rotationSpeed
+        
+        updateRotationalConstants()
 
         // X-axis wrapping
         if (x > screenWidth + size * 4) x = -size * 2
         if (x < -size * 4) x = screenWidth.toFloat() + size * 2
     }
 
-    fun reset() {
+    private fun updateRotationalConstants() {
+        cachedScaleX = cos(rotationX.toDouble()).toFloat()
+        cachedScaleY = sin(rotationY.toDouble()).toFloat()
+    }
+
+    fun reset(fullRandomY: Boolean = false) {
         x = Random.nextFloat() * screenWidth
-        y = -size * 4
+        y = if (fullRandomY) {
+            Random.nextFloat() * screenHeight
+        } else {
+            -(Random.nextFloat() * screenHeight * 0.8f + size * 5)
+        }
+        
         isGrounded = false
         isBlowingAway = false
         swayOffset = Random.nextFloat() * Math.PI.toFloat() * 2
@@ -103,6 +187,8 @@ class Petal(
         baseRotSpeedX = (Random.nextFloat() - 0.5f) * 0.04f
         baseRotSpeedY = (Random.nextFloat() - 0.5f) * 0.1f
         baseRotSpeedZ = (Random.nextFloat() - 0.5f) * 0.06f
+        
+        updateRotationalConstants()
     }
 
     fun blowAway() {
@@ -114,24 +200,36 @@ class Petal(
     }
 
     fun draw(canvas: Canvas) {
-        paint.color = color
+        val bitmap = petalBitmap ?: return
         paint.alpha = alpha
         
-        canvas.save()
-        canvas.translate(x, y)
+        transformationMatrix.reset()
+        transformationMatrix.postTranslate(-cachedBw / 2f, -cachedBh / 2f)
+        transformationMatrix.postScale(cachedScaleX, cachedScaleY)
+        transformationMatrix.postRotate(rotationZ)
+        transformationMatrix.postTranslate(x, y)
         
-        val scaleX = cos(rotationX.toDouble()).toFloat()
-        val scaleY = sin(rotationY.toDouble()).toFloat()
-        
-        canvas.scale(scaleX, scaleY)
-        canvas.rotate(rotationZ)
-        
-        createSakuraPath()
-        canvas.drawPath(path, paint)
-        canvas.restore()
+        canvas.drawBitmap(bitmap, transformationMatrix, paint)
     }
     
-    fun updateSettings(size: Float, windStrength: Float, speed: Float, color: Int, alpha: Int, collectAtBottom: Boolean, rotationSpeed: Float) {
+    fun updateSettings(
+        screenWidth: Int,
+        screenHeight: Int,
+        size: Float,
+        windStrength: Float,
+        speed: Float,
+        color: Int,
+        alpha: Int,
+        collectAtBottom: Boolean,
+        rotationSpeed: Float
+    ) {
+        val oldWidth = this.screenWidth
+        val oldHeight = this.screenHeight
+        val oldSize = this.size
+        val oldColor = this.color
+        
+        this.screenWidth = screenWidth
+        this.screenHeight = screenHeight
         this.size = size
         this.windStrength = windStrength
         this.speed = speed
@@ -140,9 +238,24 @@ class Petal(
         this.collectAtBottom = collectAtBottom
         this.rotationSpeed = rotationSpeed
         
+        if (oldSize != size || oldColor != color) {
+            updateCachedDimensions()
+            updatePetalBitmap()
+        }
+        
         if (!collectAtBottom && isGrounded) {
             isGrounded = false
-            // Will be reset by service on next update if it's below screen
+        }
+
+        if (isGrounded && (oldWidth != screenWidth || oldHeight != screenHeight)) {
+            x = Random.nextFloat() * screenWidth
+            val maxPileY = screenHeight * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
+            y = screenHeight - (Random.nextFloat() * (screenHeight - maxPileY))
+        }
+        
+        if (!isGrounded && !isBlowingAway) {
+            if (x > screenWidth + size * 10) x = Random.nextFloat() * screenWidth
+            if (y > screenHeight + size * 10) y = -(Random.nextFloat() * screenHeight * 0.5f)
         }
     }
 }

@@ -65,9 +65,7 @@ class WallpaperPreviewView @JvmOverloads constructor(
                 }
             } else {
                 petals.forEach { 
-                    it.screenWidth = width
-                    it.screenHeight = height
-                    it.updateSettings(size, wind, speed, color, alpha, collect, rotSpeed) 
+                    it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed)
                 }
             }
         }
