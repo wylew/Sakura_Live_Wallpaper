@@ -1,6 +1,6 @@
 # Sakura Live Wallpaper
 
-<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png" width="128" height="128" align="right" />
+<img src="https://github.com/wylew/Sakura_Live_Wallpaper/blob/main/ic_launcher_round.png" width="128" height="128" align="right" />
 
 A beautiful, highly customizable Android Live Wallpaper that brings the serene beauty of falling cherry blossoms to your home screen. Designed with modern Android standards and a focus on performance and "Expressive" Material 3 aesthetics.
 
@@ -26,10 +26,9 @@ A beautiful, highly customizable Android Live Wallpaper that brings the serene b
 
 ## 📸 Screenshots
 
-| Home Screen | Settings Menu |
+| Settings Menu | Home Screen |
 | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/user-attachments/assets/60088804-0094-4904-9993-909990999099" width="300" /> | <img src="https://raw.githubusercontent.com/user-attachments/assets/60088804-0094-4904-9993-909990999099" width="300" /> |
-*(Note: Replace these placeholder links with your actual repository asset links)*
+| <img src="https://github.com/wylew/Sakura_Live_Wallpaper/blob/main/Screenshot_20260324_154414.png" width="300" /> | <img src="https://github.com/wylew/Sakura_Live_Wallpaper/blob/main/Screenshot_20260324_154438.png" width="300" /> |
 
 ## 🛠️ How It Was Made
 
