@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -33,6 +35,7 @@ class SettingsActivity : AppCompatActivity() {
         setupSliders()
         setupButtons()
         setupCheckbox()
+        updateSettleSettingsState(prefs.getBoolean("collect_at_bottom", false))
     }
 
     private fun setupSliders() {
@@ -98,6 +101,24 @@ class SettingsActivity : AppCompatActivity() {
                 prefs.edit().putInt("petal_alpha", value.toInt()).apply()
             }
         }
+
+        findViewById<Slider>(R.id.slider_settle_probability).apply {
+            valueFrom = WallpaperConfig.SETTLE_PROBABILITY_MIN
+            valueTo = WallpaperConfig.SETTLE_PROBABILITY_MAX
+            value = prefs.getFloat("settle_probability", WallpaperConfig.SETTLE_PROBABILITY_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("settle_probability", value).apply()
+            }
+        }
+
+        findViewById<Slider>(R.id.slider_settle_height).apply {
+            valueFrom = WallpaperConfig.PILE_HEIGHT_MIN
+            valueTo = WallpaperConfig.PILE_HEIGHT_MAX
+            value = prefs.getFloat("max_pile_height", WallpaperConfig.PILE_HEIGHT_DEFAULT).coerceIn(valueFrom, valueTo)
+            addOnChangeListener { _, value, _ ->
+                prefs.edit().putFloat("max_pile_height", value).apply()
+            }
+        }
     }
 
     private fun setupButtons() {
@@ -118,8 +139,24 @@ class SettingsActivity : AppCompatActivity() {
             isChecked = prefs.getBoolean("collect_at_bottom", false)
             setOnCheckedChangeListener { _, isChecked ->
                 prefs.edit().putBoolean("collect_at_bottom", isChecked).apply()
+                updateSettleSettingsState(isChecked)
             }
         }
+    }
+
+    private fun updateSettleSettingsState(enabled: Boolean) {
+        val alpha = if (enabled) 1.0f else 0.4f
+        
+        findViewById<View>(R.id.layout_settle_prob).apply {
+            this.isEnabled = enabled
+            this.alpha = alpha
+        }
+        findViewById<View>(R.id.layout_settle_height).apply {
+            this.isEnabled = enabled
+            this.alpha = alpha
+        }
+        findViewById<Slider>(R.id.slider_settle_probability).isEnabled = enabled
+        findViewById<Slider>(R.id.slider_settle_height).isEnabled = enabled
     }
 
     private fun interpolateColor(fraction: Float): Int {

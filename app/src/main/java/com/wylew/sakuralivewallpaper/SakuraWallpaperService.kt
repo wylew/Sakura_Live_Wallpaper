@@ -330,6 +330,9 @@ class SakuraWallpaperService : WallpaperService() {
                         groundedLayerBitmap?.let { canvas.drawBitmap(it, 0f, 0f, null) }
 
                         val collect = prefs.getBoolean("collect_at_bottom", false)
+                        val settleProb = prefs.getFloat("settle_probability", WallpaperConfig.SETTLE_PROBABILITY_DEFAULT)
+                        val pileHeightPercent = prefs.getFloat("max_pile_height", WallpaperConfig.PILE_HEIGHT_DEFAULT)
+                        
                         val targetCount = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
                         val maxCount = if (powerManager.isPowerSaveMode) (targetCount * 0.5f).toInt() else targetCount
 
@@ -340,15 +343,15 @@ class SakuraWallpaperService : WallpaperService() {
                                 p.update(deltaTime)
                                 p.draw(canvas)
 
-                                val isOffBottom = p.y > canvas.height + p.size * 4
+                                val isOffBottom = p.y > canvas.height - p.size
                                 val isBlowingOffScreen = p.isBlowingAway && (p.y < -p.size * 10 || p.x < -p.size * 10 || p.x > canvas.width + p.size * 10)
 
                                 if (isOffBottom || isBlowingOffScreen) {
                                     if (isOffBottom && !p.isBlowingAway && collect && groundedPetals.size < WallpaperConfig.MAX_GROUNDED_PETALS) {
-                                        if (Random.nextFloat() < WallpaperConfig.SETTLE_PROBABILITY) {
-                                            val maxPileY = canvas.height * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
+                                        if (Random.nextFloat() < settleProb) {
+                                            val maxPileY = canvas.height * (1f - pileHeightPercent)
                                             p.y = canvas.height - (Random.nextFloat() * (canvas.height - maxPileY))
-                                            p.isGrounded = true
+                                            p.settle()
                                             groundedPetals.add(p)
                                             groundedLayerCanvas?.let { p.draw(it) }
                                             activeIterator.remove()

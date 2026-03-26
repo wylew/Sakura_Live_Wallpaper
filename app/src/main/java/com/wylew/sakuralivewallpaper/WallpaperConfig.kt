@@ -37,9 +37,16 @@ object WallpaperConfig {
     val COLOR_START = Color.WHITE
     val COLOR_END = Color.rgb(255, 182, 193) // Light Pink
 
+    // Settle Settings
+    const val SETTLE_PROBABILITY_MIN = 0.0f
+    const val SETTLE_PROBABILITY_MAX = 1.0f
+    const val SETTLE_PROBABILITY_DEFAULT = 0.15f
+
+    const val PILE_HEIGHT_MIN = 0.0f
+    const val PILE_HEIGHT_MAX = 1.0f
+    const val PILE_HEIGHT_DEFAULT = 0.10f
+
     // Internal Logic (Not user facing)
-    const val SETTLE_PROBABILITY = 0.15f // 50% chance to settle
-    const val MAX_PILE_HEIGHT_PERCENT = 0.10f // 15% of screen height
     const val SHAKE_THRESHOLD = 12.0f // Sensitivity for shake detection
     const val MAX_GROUNDED_PETALS = 750 // Maximum number of petals that can settle at the bottom
 }

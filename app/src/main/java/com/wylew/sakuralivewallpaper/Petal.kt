@@ -249,7 +249,7 @@ class Petal(
 
         if (isGrounded && (oldWidth != screenWidth || oldHeight != screenHeight)) {
             x = Random.nextFloat() * screenWidth
-            val maxPileY = screenHeight * (1f - WallpaperConfig.MAX_PILE_HEIGHT_PERCENT)
+            val maxPileY = screenHeight * (1f - WallpaperConfig.PILE_HEIGHT_DEFAULT)
             y = screenHeight - (Random.nextFloat() * (screenHeight - maxPileY))
         }
         
