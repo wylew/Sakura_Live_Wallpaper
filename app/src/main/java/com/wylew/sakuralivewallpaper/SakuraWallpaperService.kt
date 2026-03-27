@@ -128,13 +128,17 @@ class SakuraWallpaperService : WallpaperService() {
             
             if (width > 0 && height > 0) {
                 val targetCount = prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT)
-                val wind = prefs.getFloat("wind_strength", 0.5f)
-                val size = prefs.getFloat("petal_size", 20f)
-                val speed = prefs.getFloat("fall_speed", 0.5f)
-                val rotSpeed = prefs.getFloat("rotation_speed", 1.0f)
-                val color = prefs.getInt("petal_color", Color.WHITE)
-                val alpha = prefs.getInt("petal_alpha", 200)
+                val wind = prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT)
+                val size = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT)
+                val speed = prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT)
+                val rotSpeed = prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT)
+                val color = prefs.getInt("petal_color", WallpaperConfig.COLOR_START)
+                val alpha = prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT)
                 val collect = prefs.getBoolean("collect_at_bottom", false)
+                
+                // New turbulence settings
+                val turbSpeed = prefs.getFloat("turbulence_speed", WallpaperConfig.TURBULENCE_SPEED_DEFAULT)
+                val turbRadius = prefs.getFloat("turbulence_radius", WallpaperConfig.TURBULENCE_RADIUS_DEFAULT)
 
                 val oldWidth = activePetals.firstOrNull()?.screenWidth ?: 0
                 val oldHeight = activePetals.firstOrNull()?.screenHeight ?: 0
@@ -164,8 +168,8 @@ class SakuraWallpaperService : WallpaperService() {
                         }
                     }
 
-                    activePetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed) }
-                    groundedPetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed) }
+                    activePetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed, turbSpeed, turbRadius) }
+                    groundedPetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed, turbSpeed, turbRadius) }
                 }
                 
                 if (collect) {
@@ -235,13 +239,15 @@ class SakuraWallpaperService : WallpaperService() {
                 width,
                 height,
                 0,
-                prefs.getFloat("wind_strength", 0.5f),
-                prefs.getFloat("petal_size", 20f),
-                prefs.getFloat("fall_speed", 0.5f),
-                prefs.getInt("petal_color", Color.WHITE),
-                prefs.getInt("petal_alpha", 200),
+                prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT),
+                prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT),
+                prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT),
+                prefs.getInt("petal_color", WallpaperConfig.COLOR_START),
+                prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT),
                 prefs.getBoolean("collect_at_bottom", false),
-                prefs.getFloat("rotation_speed", 1.0f)
+                prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT),
+                prefs.getFloat("turbulence_speed", WallpaperConfig.TURBULENCE_SPEED_DEFAULT),
+                prefs.getFloat("turbulence_radius", WallpaperConfig.TURBULENCE_RADIUS_DEFAULT)
             )
         }
 

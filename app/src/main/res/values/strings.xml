@@ -9,5 +9,5 @@
     <string name="pref_petal_color">Petal Color</string>
     <string name="pref_transparency">Transparency</string>
     <string name="pref_background_image">Background Image</string>
-    <string name="pref_collect_at_bottom">Collect at Bottom</string>
+    <string name="pref_collect_at_bottom">Pedals Settle on Screen</string>
 </resources>

@@ -19,7 +19,9 @@ class Petal(
     var color: Int,
     var alpha: Int,
     var collectAtBottom: Boolean,
-    var rotationSpeed: Float
+    var rotationSpeed: Float,
+    var turbulenceSpeed: Float = WallpaperConfig.TURBULENCE_SPEED_DEFAULT,
+    var turbulenceRadius: Float = WallpaperConfig.TURBULENCE_RADIUS_DEFAULT
 ) {
     var x = 0f
     var y = 0f
@@ -37,6 +39,8 @@ class Petal(
     private var horizontalDrift = (Random.nextFloat() - 0.5f) * 30f
     private var verticalOscillationOffset = Random.nextFloat() * Math.PI.toFloat() * 2
     private var verticalOscillationSpeed = 0.5f + Random.nextFloat() * 1f
+
+    private var swirlOffset = Random.nextFloat() * Math.PI.toFloat() * 2
     
     var isGrounded = false
     var isBlowingAway = false
@@ -94,8 +98,6 @@ class Petal(
             
             canvas.drawPath(path, paint)
             
-            // Fixed: We MUST NOT use HARDWARE bitmaps here because they cannot be 
-            // drawn into the software-backed groundedLayerCanvas.
             cachedBitmap = softwareBitmap
             return softwareBitmap
         }
@@ -136,19 +138,46 @@ class Petal(
             return
         }
 
+        val totalTime = System.currentTimeMillis() / 1000f
+
         verticalOscillationOffset += deltaTime * verticalOscillationSpeed
         val vOsc = sin(verticalOscillationOffset.toDouble()).toFloat() * 15f
+        
+        // Turbulence/Swirl logic
+        // turbulenceSpeed now controls the linear speed (traversal rate) along the path
+        // turbulenceRadius controls the size of the path
+        val R = turbulenceRadius * 150f 
+        val linearSpeed = 200f * turbulenceSpeed // Max path traversal speed
+        
+        // Angular frequency (omega) = v / R
+        // We cap omega to avoid infinite/extreme rotation at tiny radii
+        val omega = if (R > 5f) (linearSpeed / R).coerceAtMost(10f) else 0f
+        
+        swirlOffset += deltaTime * omega
+        
+        // Velocity for circular motion
+        // v_x = -linearSpeed * sin(theta), v_y = linearSpeed * cos(theta)
+        val swirlVx = if (R > 5f) -linearSpeed * sin(swirlOffset.toDouble()).toFloat() else 0f
+        val swirlVy = if (R > 5f) linearSpeed * cos(swirlOffset.toDouble()).toFloat() else 0f
+        
+        // Tumbling effect tied to turbulence speed
+        rotationZ += (turbulenceSpeed * 10f + turbulenceRadius * 2f) * deltaTime * 50f
+
         val baseSpeed = (40f + speed * 160f) + vOsc
-        y += baseSpeed * deltaTime
+        y += (baseSpeed + swirlVy) * deltaTime
         
         swayOffset += deltaTime * swaySpeed
         val breeze = sin(swayOffset.toDouble()).toFloat() * (15f + windStrength * 120f)
         val windDrift = windStrength * 250f
-        x += (windDrift + breeze + horizontalDrift) * deltaTime
         
-        rotationX += baseRotSpeedX * rotationSpeed
-        rotationY += baseRotSpeedY * rotationSpeed
-        rotationZ += baseRotSpeedZ * rotationSpeed
+        // Global gust tied to turbulence speed
+        val globalGust = sin(totalTime * 1.5).toFloat() * (turbulenceSpeed * 50f)
+        
+        x += (windDrift + breeze + horizontalDrift + globalGust + swirlVx) * deltaTime
+        
+        rotationX += baseRotSpeedX * rotationSpeed * (1f + turbulenceSpeed)
+        rotationY += baseRotSpeedY * rotationSpeed * (1f + turbulenceSpeed)
+        rotationZ += baseRotSpeedZ * rotationSpeed * (1f + turbulenceSpeed)
         
         updateRotationalConstants()
 
@@ -185,7 +214,6 @@ class Petal(
 
     fun settle() {
         isGrounded = true
-        // Ensure the petal is flattened and visible when grounded
         cachedScaleX = 0.8f + Random.nextFloat() * 0.2f
         cachedScaleY = 0.8f + Random.nextFloat() * 0.2f
         rotationZ = Random.nextFloat() * 360f
@@ -221,7 +249,9 @@ class Petal(
         color: Int,
         alpha: Int,
         collectAtBottom: Boolean,
-        rotationSpeed: Float
+        rotationSpeed: Float,
+        turbulenceSpeed: Float = WallpaperConfig.TURBULENCE_SPEED_DEFAULT,
+        turbulenceRadius: Float = WallpaperConfig.TURBULENCE_RADIUS_DEFAULT
     ) {
         val oldWidth = this.screenWidth
         val oldHeight = this.screenHeight
@@ -237,6 +267,8 @@ class Petal(
         this.alpha = alpha
         this.collectAtBottom = collectAtBottom
         this.rotationSpeed = rotationSpeed
+        this.turbulenceSpeed = turbulenceSpeed
+        this.turbulenceRadius = turbulenceRadius
         
         if (oldSize != size || oldColor != color) {
             updateCachedDimensions()
