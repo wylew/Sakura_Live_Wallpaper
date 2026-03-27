@@ -7,12 +7,9 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.slider.Slider
 import kotlin.math.roundToInt
 
@@ -41,7 +38,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupSliders() {
-        findViewById<Slider>(R.id.slider_petal_count).apply {
+        findViewById<Slider>(R.id.slider_petal_count)?.apply {
             valueFrom = WallpaperConfig.PETAL_COUNT_MIN.toFloat()
             valueTo = WallpaperConfig.PETAL_COUNT_MAX.toFloat()
             updateValue(this, prefs.getInt("petal_count", WallpaperConfig.PETAL_COUNT_DEFAULT).toFloat())
@@ -50,7 +47,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_wind_strength).apply {
+        findViewById<Slider>(R.id.slider_wind_strength)?.apply {
             valueFrom = WallpaperConfig.WIND_STRENGTH_MIN
             valueTo = WallpaperConfig.WIND_STRENGTH_MAX
             val step = 0.05f
@@ -62,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_turbulence_speed).apply {
+        findViewById<Slider>(R.id.slider_turbulence_speed)?.apply {
             valueFrom = WallpaperConfig.TURBULENCE_SPEED_MIN
             valueTo = WallpaperConfig.TURBULENCE_SPEED_MAX
             updateValue(this, prefs.getFloat("turbulence_speed", WallpaperConfig.TURBULENCE_SPEED_DEFAULT))
@@ -71,7 +68,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_turbulence_radius).apply {
+        findViewById<Slider>(R.id.slider_turbulence_radius)?.apply {
             valueFrom = WallpaperConfig.TURBULENCE_RADIUS_MIN
             valueTo = WallpaperConfig.TURBULENCE_RADIUS_MAX
             updateValue(this, prefs.getFloat("turbulence_radius", WallpaperConfig.TURBULENCE_RADIUS_DEFAULT))
@@ -80,7 +77,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_petal_size).apply {
+        findViewById<Slider>(R.id.slider_petal_size)?.apply {
             valueFrom = WallpaperConfig.PETAL_SIZE_MIN
             valueTo = WallpaperConfig.PETAL_SIZE_MAX
             updateValue(this, prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT))
@@ -89,7 +86,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_fall_speed).apply {
+        findViewById<Slider>(R.id.slider_fall_speed)?.apply {
             valueFrom = WallpaperConfig.FALL_SPEED_MIN
             valueTo = WallpaperConfig.FALL_SPEED_MAX
             updateValue(this, prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT))
@@ -98,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_rotation_speed).apply {
+        findViewById<Slider>(R.id.slider_rotation_speed)?.apply {
             valueFrom = WallpaperConfig.ROTATION_SPEED_MIN
             valueTo = WallpaperConfig.ROTATION_SPEED_MAX
             updateValue(this, prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT))
@@ -107,7 +104,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_petal_color).apply {
+        findViewById<Slider>(R.id.slider_petal_color)?.apply {
             valueFrom = 0f
             valueTo = 100f
             val color = prefs.getInt("petal_color", WallpaperConfig.COLOR_DEFAULT)
@@ -117,7 +114,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_transparency).apply {
+        findViewById<Slider>(R.id.slider_transparency)?.apply {
             valueFrom = WallpaperConfig.ALPHA_MIN.toFloat()
             valueTo = WallpaperConfig.ALPHA_MAX.toFloat()
             updateValue(this, prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT).toFloat())
@@ -126,7 +123,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_settle_probability).apply {
+        findViewById<Slider>(R.id.slider_settle_probability)?.apply {
             valueFrom = WallpaperConfig.SETTLE_PROBABILITY_MIN
             valueTo = WallpaperConfig.SETTLE_PROBABILITY_MAX
             updateValue(this, prefs.getFloat("settle_probability", WallpaperConfig.SETTLE_PROBABILITY_DEFAULT))
@@ -135,7 +132,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Slider>(R.id.slider_settle_height).apply {
+        findViewById<Slider>(R.id.slider_settle_height)?.apply {
             valueFrom = WallpaperConfig.PILE_HEIGHT_MIN
             valueTo = WallpaperConfig.PILE_HEIGHT_MAX
             updateValue(this, prefs.getFloat("max_pile_height", WallpaperConfig.PILE_HEIGHT_DEFAULT))
@@ -150,18 +147,18 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        findViewById<ExtendedFloatingActionButton>(R.id.btn_select_background).setOnClickListener {
+        findViewById<View>(R.id.btn_select_background)?.setOnClickListener {
             pickImage.launch("image/*")
         }
 
-        findViewById<ExtendedFloatingActionButton>(R.id.btn_set_wallpaper).setOnClickListener {
+        findViewById<View>(R.id.btn_set_wallpaper)?.setOnClickListener {
             val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                 ComponentName(this, SakuraWallpaperService::class.java))
             startActivity(intent)
         }
 
-        findViewById<MaterialButton>(R.id.btn_reset_defaults).setOnClickListener {
+        findViewById<View>(R.id.btn_reset_defaults)?.setOnClickListener {
             resetToDefaults()
         }
     }
@@ -190,7 +187,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupCheckbox() {
-        findViewById<MaterialCheckBox>(R.id.check_collect_at_bottom).apply {
+        findViewById<MaterialCheckBox>(R.id.check_collect_at_bottom)?.apply {
             isChecked = prefs.getBoolean("collect_at_bottom", WallpaperConfig.COLLECT_AT_BOTTOM_DEFAULT)
             setOnCheckedChangeListener { _, isChecked ->
                 prefs.edit().putBoolean("collect_at_bottom", isChecked).apply()
@@ -200,18 +197,18 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateSettleSettingsState(enabled: Boolean) {
-        val alpha = if (enabled) 1.0f else 0.4f
+        val alphaValue = if (enabled) 1.0f else 0.4f
         
-        findViewById<View>(R.id.layout_settle_prob).apply {
+        findViewById<View>(R.id.layout_settle_prob)?.apply {
             this.isEnabled = enabled
-            this.alpha = alpha
+            this.alpha = alphaValue
         }
-        findViewById<View>(R.id.layout_settle_height).apply {
+        findViewById<View>(R.id.layout_settle_height)?.apply {
             this.isEnabled = enabled
-            this.alpha = alpha
+            this.alpha = alphaValue
         }
-        findViewById<Slider>(R.id.slider_settle_probability).isEnabled = enabled
-        findViewById<Slider>(R.id.slider_settle_height).isEnabled = enabled
+        findViewById<Slider>(R.id.slider_settle_probability)?.isEnabled = enabled
+        findViewById<Slider>(R.id.slider_settle_height)?.isEnabled = enabled
     }
 
     private fun interpolateColor(fraction: Float): Int {

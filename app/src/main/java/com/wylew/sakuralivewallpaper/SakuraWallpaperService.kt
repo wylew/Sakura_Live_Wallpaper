@@ -167,8 +167,36 @@ class SakuraWallpaperService : WallpaperService() {
                         }
                     }
 
-                    activePetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed, turbSpeed, turbRadius) }
-                    groundedPetals.forEach { it.updateSettings(width, height, size, wind, speed, color, alpha, collect, rotSpeed, turbSpeed, turbRadius) }
+                    activePetals.forEach { 
+                        it.updateSettings(
+                            screenWidth = width, 
+                            screenHeight = height, 
+                            windStrength = wind,
+                            size = size, 
+                            speed = speed, 
+                            color = color, 
+                            alpha = alpha, 
+                            collectAtBottom = collect, 
+                            rotationSpeed = rotSpeed, 
+                            turbulenceSpeed = turbSpeed, 
+                            turbulenceRadius = turbRadius
+                        ) 
+                    }
+                    groundedPetals.forEach { 
+                        it.updateSettings(
+                            screenWidth = width, 
+                            screenHeight = height, 
+                            windStrength = wind,
+                            size = size, 
+                            speed = speed, 
+                            color = color, 
+                            alpha = alpha, 
+                            collectAtBottom = collect, 
+                            rotationSpeed = rotSpeed, 
+                            turbulenceSpeed = turbSpeed, 
+                            turbulenceRadius = turbRadius
+                        ) 
+                    }
                 }
                 
                 if (collect) {
@@ -190,23 +218,34 @@ class SakuraWallpaperService : WallpaperService() {
             val bh = original.height.toFloat()
             val scale = if (bw * height > width * bh) height / bh else width / bw
             
-            val sw = (bw * scale).toInt()
-            val sh = (bh * scale).toInt()
+            // Use ceil and ensure at least screen dimensions to avoid crop errors
+            val sw = Math.ceil((bw * scale).toDouble()).toInt().coerceAtLeast(width)
+            val sh = Math.ceil((bh * scale).toDouble()).toInt().coerceAtLeast(height)
             
-            val softwareScaled = original.scale(sw, sh, true)
+            val softwareScaled = try {
+                original.scale(sw, sh, true)
+            } catch (e: OutOfMemoryError) {
+                Log.e(tag, "OOM while scaling background", e)
+                return
+            }
             
             // Center crop
             val x = (sw - width) / 2
             val y = (sh - height) / 2
-            val cropped = Bitmap.createBitmap(softwareScaled, x, y, width, height)
+            val cropped = try {
+                Bitmap.createBitmap(softwareScaled, x, y, width, height)
+            } catch (e: Exception) {
+                Log.e(tag, "Error cropping background", e)
+                softwareScaled
+            }
             
             scaledBackground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val hw = cropped.copy(Bitmap.Config.HARDWARE, false)
-                cropped.recycle()
+                if (cropped != softwareScaled) cropped.recycle()
                 softwareScaled.recycle()
                 hw ?: cropped
             } else {
-                softwareScaled.recycle()
+                if (cropped != softwareScaled) softwareScaled.recycle()
                 cropped
             }
         }
@@ -228,8 +267,14 @@ class SakuraWallpaperService : WallpaperService() {
         private fun ensureGroundedLayer(width: Int, height: Int) {
             if (groundedLayerBitmap == null || groundedLayerBitmap!!.width != width || groundedLayerBitmap!!.height != height) {
                 groundedLayerBitmap?.recycle()
-                groundedLayerBitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                groundedLayerCanvas = Canvas(groundedLayerBitmap!!)
+                try {
+                    groundedLayerBitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                    groundedLayerCanvas = Canvas(groundedLayerBitmap!!)
+                } catch (e: OutOfMemoryError) {
+                    Log.e(tag, "OOM while creating grounded layer", e)
+                    groundedLayerBitmap = null
+                    groundedLayerCanvas = null
+                }
             }
         }
 
@@ -237,8 +282,8 @@ class SakuraWallpaperService : WallpaperService() {
             return Petal(
                 screenWidth = width,
                 screenHeight = height,
-                size = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT),
                 windStrength = prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT),
+                size = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT),
                 speed = prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT),
                 color = prefs.getInt("petal_color", WallpaperConfig.COLOR_START),
                 alpha = prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT),
