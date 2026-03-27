@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.core.graphics.createBitmap
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -12,7 +13,6 @@ import kotlin.random.Random
 class Petal(
     var screenWidth: Int,
     var screenHeight: Int,
-    var count: Int,
     var windStrength: Float,
     var size: Float,
     var speed: Float,
@@ -74,7 +74,7 @@ class Petal(
             val bw = (size * 2.4f) + padding * 2
             val bh = (size * 2f) + padding * 2
             
-            val softwareBitmap = Bitmap.createBitmap(
+            val softwareBitmap = createBitmap(
                 bw.toInt().coerceAtLeast(1), 
                 bh.toInt().coerceAtLeast(1), 
                 Bitmap.Config.ARGB_8888
@@ -86,27 +86,19 @@ class Petal(
             
             val cx = size * 1.2f + padding
             val cy = size + padding
-            val s = size
             
             val path = Path()
-            path.moveTo(cx, cy + s)
-            path.cubicTo(cx + s * 1.2f, cy + s * 0.5f, cx + s * 1.2f, cy - s * 0.5f, cx + s * 0.3f, cy - s)
-            path.lineTo(cx, cy - s * 0.7f)
-            path.lineTo(cx - s * 0.3f, cy - s)
-            path.cubicTo(cx - s * 1.2f, cy - s * 0.5f, cx - s * 1.2f, cy + s * 0.5f, cx, cy + s)
+            path.moveTo(cx, cy + size)
+            path.cubicTo(cx + size * 1.2f, cy + size * 0.5f, cx + size * 1.2f, cy - size * 0.5f, cx + size * 0.3f, cy - size)
+            path.lineTo(cx, cy - size * 0.7f)
+            path.lineTo(cx - size * 0.3f, cy - size)
+            path.cubicTo(cx - size * 1.2f, cy - size * 0.5f, cx - size * 1.2f, cy + size * 0.5f, cx, cy + size)
             path.close()
             
             canvas.drawPath(path, paint)
             
             cachedBitmap = softwareBitmap
             return softwareBitmap
-        }
-        
-        fun clearCache() {
-            cachedBitmap?.recycle()
-            cachedBitmap = null
-            lastSize = -1f
-            lastColor = -1
         }
     }
 
@@ -144,21 +136,17 @@ class Petal(
         val vOsc = sin(verticalOscillationOffset.toDouble()).toFloat() * 15f
         
         // Turbulence/Swirl logic
-        // turbulenceSpeed now controls the linear speed (traversal rate) along the path
-        // turbulenceRadius controls the size of the path
-        val R = turbulenceRadius * 150f 
+        val radius = turbulenceRadius * 150f 
         val linearSpeed = 200f * turbulenceSpeed // Max path traversal speed
         
         // Angular frequency (omega) = v / R
-        // We cap omega to avoid infinite/extreme rotation at tiny radii
-        val omega = if (R > 5f) (linearSpeed / R).coerceAtMost(10f) else 0f
+        val omega = if (radius > 5f) (linearSpeed / radius).coerceAtMost(10f) else 0f
         
         swirlOffset += deltaTime * omega
         
         // Velocity for circular motion
-        // v_x = -linearSpeed * sin(theta), v_y = linearSpeed * cos(theta)
-        val swirlVx = if (R > 5f) -linearSpeed * sin(swirlOffset.toDouble()).toFloat() else 0f
-        val swirlVy = if (R > 5f) linearSpeed * cos(swirlOffset.toDouble()).toFloat() else 0f
+        val swirlVx = if (radius > 5f) -linearSpeed * sin(swirlOffset.toDouble()).toFloat() else 0f
+        val swirlVy = if (radius > 5f) linearSpeed * cos(swirlOffset.toDouble()).toFloat() else 0f
         
         // Tumbling effect tied to turbulence speed
         rotationZ += (turbulenceSpeed * 10f + turbulenceRadius * 2f) * deltaTime * 50f
