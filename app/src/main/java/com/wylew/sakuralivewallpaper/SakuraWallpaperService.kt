@@ -1,6 +1,5 @@
 package com.wylew.sakuralivewallpaper
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -236,18 +235,17 @@ class SakuraWallpaperService : WallpaperService() {
 
         private fun createNewPetal(width: Int, height: Int): Petal {
             return Petal(
-                width,
-                height,
-                0,
-                prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT),
-                prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT),
-                prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT),
-                prefs.getInt("petal_color", WallpaperConfig.COLOR_START),
-                prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT),
-                prefs.getBoolean("collect_at_bottom", false),
-                prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT),
-                prefs.getFloat("turbulence_speed", WallpaperConfig.TURBULENCE_SPEED_DEFAULT),
-                prefs.getFloat("turbulence_radius", WallpaperConfig.TURBULENCE_RADIUS_DEFAULT)
+                screenWidth = width,
+                screenHeight = height,
+                size = prefs.getFloat("petal_size", WallpaperConfig.PETAL_SIZE_DEFAULT),
+                windStrength = prefs.getFloat("wind_strength", WallpaperConfig.WIND_STRENGTH_DEFAULT),
+                speed = prefs.getFloat("fall_speed", WallpaperConfig.FALL_SPEED_DEFAULT),
+                color = prefs.getInt("petal_color", WallpaperConfig.COLOR_START),
+                alpha = prefs.getInt("petal_alpha", WallpaperConfig.ALPHA_DEFAULT),
+                collectAtBottom = prefs.getBoolean("collect_at_bottom", false),
+                rotationSpeed = prefs.getFloat("rotation_speed", WallpaperConfig.ROTATION_SPEED_DEFAULT),
+                turbulenceSpeed = prefs.getFloat("turbulence_speed", WallpaperConfig.TURBULENCE_SPEED_DEFAULT),
+                turbulenceRadius = prefs.getFloat("turbulence_radius", WallpaperConfig.TURBULENCE_RADIUS_DEFAULT)
             )
         }
 

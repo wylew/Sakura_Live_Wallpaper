@@ -65,7 +65,19 @@ class WallpaperPreviewView @JvmOverloads constructor(
             if (petals.size != count) {
                 petals.clear()
                 repeat(count) {
-                    petals.add(Petal(width, height, count, wind, size, speed, color, alpha, collect, rotSpeed, turbSpeed, turbRadius))
+                    petals.add(Petal(
+                        screenWidth = width,
+                        screenHeight = height,
+                        size = size,
+                        windStrength = wind,
+                        speed = speed,
+                        color = color,
+                        alpha = alpha,
+                        collectAtBottom = collect,
+                        rotationSpeed = rotSpeed,
+                        turbulenceSpeed = turbSpeed,
+                        turbulenceRadius = turbRadius
+                    ))
                 }
             } else {
                 petals.forEach { 

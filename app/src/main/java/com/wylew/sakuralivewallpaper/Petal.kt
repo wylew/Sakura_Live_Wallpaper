@@ -13,8 +13,8 @@ import kotlin.random.Random
 class Petal(
     var screenWidth: Int,
     var screenHeight: Int,
-    var windStrength: Float,
     var size: Float,
+    var windStrength: Float,
     var speed: Float,
     var color: Int,
     var alpha: Int,

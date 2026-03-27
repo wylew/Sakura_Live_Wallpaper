@@ -11,13 +11,18 @@ A beautiful, highly customizable Android Live Wallpaper that brings the serene b
     - **Wind Strength**: Control the horizontal drift and breeze intensity.
     - **Fall Speed**: Adjust how quickly the petals descend.
     - **Rotation Speed**: Fine-tune the spinning motion of falling blossoms.
+    - **NEW: Turbulence & Swirls**: Add complex air currents with adjustable turbulence speed and radius for more organic, swirling paths.
 - **Visual Customization**:
     - **Petal Count**: Scale from a few drifting petals to a full blizzard (up to 500 active).
     - **Petal Size & Transparency**: Customize the scale and alpha of the blossoms.
     - **Custom Colors**: Interpolate between soft whites and deep Sakura pinks.
 - **Interactive Elements**:
     - **Collect at Bottom**: Let petals settle on the bottom of your screen to form a pile.
+    - **NEW: Pile Customization**: Adjust the maximum pile height and the probability of petals settling.
     - **Shake to Clear**: Uses the device accelerometer—shake your phone to blow away grounded petals in a gust of wind.
+- **Optimization**:
+    - **NEW: Battery Saver Aware**: Automatically scales target frame rate (30 FPS in Power Save Mode, 60 FPS otherwise) to preserve battery life.
+    - **Hardware Acceleration**: Utilizes hardware-accelerated canvases for smooth rendering on modern devices.
 - **Personalized Backgrounds**: Select any image from your gallery to serve as the backdrop for your falling petals.
 - **Modern UI**: A sleek settings menu using **Material 3 Expressive** design norms, featuring:
     - Interactive live preview window.
@@ -36,7 +41,7 @@ This project was built using modern Android development practices:
 
 - **Kotlin**: The entire logic is written in Kotlin for safety and conciseness.
 - **Custom Canvas Rendering**: The wallpaper engine uses a low-level `Canvas` and `SurfaceHolder` approach to render hundreds of petals at 60 FPS without the overhead of heavy graphics libraries.
-- **Vector-based Math**: Each petal follows a unique path calculated using sine wave oscillations and basic physics vectors for drift and gravity.
+- **Vector-based Math**: Each petal follows a unique path calculated using sine wave oscillations, circular motion vectors (for turbulence), and global gusts for drift and gravity.
 - **Material 3 (M3)**: The settings interface utilizes the latest Google Material 3 components, including `Slider`, `MaterialSwitch`, and `MaterialCardView`, ensuring a native look and feel on modern Android devices.
 - **Sensor API**: Integrated `SensorManager` to detect G-force thresholds, enabling the immersive "Shake to Clear" interaction.
 - **Responsive Layouts**: Uses resource qualifiers (`layout-sw600dp`) to provide a optimized side-by-side experience for tablets and large-screen devices.
